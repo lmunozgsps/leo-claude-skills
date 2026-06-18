@@ -1,0 +1,28 @@
+#%RAML 1.0 Trait
+# Trait reutilizable que estandariza respuestas de error de cliente.
+# Mantiene un cuerpo de error consistente en toda la API (DRY).
+responses:
+  400:
+    description: Petición malformada o parámetros inválidos.
+    body:
+      application/json:
+        type: Error
+  401:
+    description: No autenticado.
+    body:
+      application/json:
+        type: Error
+  403:
+    description: Autenticado pero sin permisos suficientes.
+    body:
+      application/json:
+        type: Error
+  429:
+    description: Límite de tasa excedido.
+    headers:
+      Retry-After:
+        type: integer
+        description: Segundos a esperar antes de reintentar.
+    body:
+      application/json:
+        type: Error

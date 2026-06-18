@@ -1,0 +1,32 @@
+#%RAML 1.0 DataType
+# Fragmento reutilizable de error. Publicable en Exchange como API fragment
+# de tipo "DataType". Estructura alineada a un cuerpo de error consistente.
+type: object
+additionalProperties: false
+properties:
+  code:
+    type: string
+    description: Código de error estable y documentado (no el mensaje).
+    pattern: "^[A-Z][A-Z0-9_]{2,49}$"
+    example: VALIDATION_ERROR
+  title:
+    type: string
+    minLength: 1
+    maxLength: 120
+    example: Validation Error
+  status:
+    type: integer
+    minimum: 400
+    maximum: 599
+    example: 400
+  detail:
+    type: string
+    description: Mensaje legible y accionable. NUNCA exponer stack traces, SQL,
+      rutas internas ni datos de otros recursos.
+    maxLength: 1000
+    required: false
+  instance:
+    type: string
+    description: Referencia de la petición (correlation id) para trazabilidad.
+    required: false
+    example: req-abc123

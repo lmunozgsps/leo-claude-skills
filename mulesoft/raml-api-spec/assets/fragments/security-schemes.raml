@@ -1,0 +1,40 @@
+#%RAML 1.0 SecurityScheme
+# Fragmento reutilizable de securityScheme. Publicable en Exchange.
+# Este describe OAuth 2.0; el enforcement real lo aplica una policy en
+# API Manager (OAuth 2.0 Access Token Enforcement). RAML documenta el
+# CONTRATO; la policy hace cumplir.
+type: OAuth 2.0
+description: |
+  Autenticación vía OAuth 2.0. El token se envía en el header
+  Authorization: Bearer <access_token>.
+
+  Enforcement en runtime mediante policy de API Manager
+  (OAuth 2.0 Access Token Enforcement). Para gateways que usan Client ID
+  Enforcement, añadir adicionalmente los headers client_id / client_secret
+  (ver describedBy).
+describedBy:
+  headers:
+    Authorization:
+      description: Bearer access token.
+      type: string
+      pattern: "^Bearer .+$"
+      example: Bearer eyJhbGciOiJI...
+    # Para Client ID Enforcement (alternativa o complemento):
+    # client_id:
+    #   type: string
+    #   required: true
+    # client_secret:
+    #   type: string
+    #   required: true
+  responses:
+    401:
+      description: Token ausente, inválido o expirado.
+    403:
+      description: Token válido pero sin los scopes requeridos.
+settings:
+  authorizationUri: https://login.example.com/oauth2/authorize
+  accessTokenUri: https://login.example.com/oauth2/token
+  authorizationGrants: [ client_credentials, authorization_code ]
+  scopes:
+    - read
+    - write

@@ -1,0 +1,20 @@
+#%RAML 1.0 Trait
+# Trait reutilizable de paginación offset/limit. Publicable en Exchange.
+# ALTERNATIVA a pagination-trait.raml (cursor-based). Usar SOLO cuando el
+# patrón elegido es offset (ver references/best-practices.md). No mezclar con
+# cursor. La respuesta de la colección debe incluir `total` cuando se usa este
+# trait (para que el cliente calcule el número de páginas).
+queryParameters:
+  offset:
+    type: integer
+    required: false
+    default: 0
+    minimum: 0
+    description: Número de elementos a saltar desde el inicio.
+  limit:
+    type: integer
+    required: false
+    default: 20
+    minimum: 1
+    maximum: 100
+    description: Número máximo de elementos por página.

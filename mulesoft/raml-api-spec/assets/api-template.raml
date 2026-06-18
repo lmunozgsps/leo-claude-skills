@@ -1,0 +1,87 @@
+#%RAML 1.0
+title: <API Title>
+version: v1
+baseUri: https://api.example.com/{version}
+mediaType: application/json
+protocols: [ HTTPS ]
+description: |
+  <Descripción corta de qué expone la API y para quién.>
+
+# ---------------------------------------------------------------------------
+# Fragmentos publicables en Exchange.
+# Al publicar en Design Center, cada !include de un fragment reutilizable
+# debería resolverse desde un módulo de Exchange con `uses:` cuando se
+# comparte entre APIs. Para fragmentos locales del proyecto, !include basta.
+# ---------------------------------------------------------------------------
+uses:
+  # secLib: exchange_modules/<org-id>/security-schemes/1.0.0/security-schemes.raml
+
+securitySchemes:
+  oauth_2_0: !include fragments/security-schemes.raml
+
+types:
+  Error:        !include fragments/error-types.raml
+  # Resource:   !include fragments/<resource>.raml
+
+traits:
+  paged:        !include fragments/pagination-trait.raml
+  clientErrors: !include fragments/client-errors-trait.raml
+
+# Política de seguridad por defecto a nivel de API (override por método si aplica)
+securedBy: [ oauth_2_0 ]
+
+/<resources>:
+  description: Colección de <resources>.
+  get:
+    is: [ paged, clientErrors ]
+    description: Lista <resources> de forma paginada.
+    responses:
+      200:
+        body:
+          application/json:
+            type: object
+            properties:
+              data:
+                type: array
+                # items: Resource
+              pagination:
+                type: object
+                properties:
+                  nextCursor:
+                    type: string
+                    required: false
+                  hasMore: boolean
+  post:
+    is: [ clientErrors ]
+    description: Crea un nuevo <resource>.
+    body:
+      application/json:
+        # type: Resource
+        # Validación declarativa: el body DEBE definir un type estricto con
+        # constraints (pattern/min/max/enum). No aceptar `type: any`.
+        type: object
+    responses:
+      201:
+        body:
+          application/json:
+            # type: Resource
+            type: object
+
+  /{id}:
+    uriParameters:
+      id:
+        type: string
+        pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        description: Identificador UUID del <resource>.
+    get:
+      is: [ clientErrors ]
+      responses:
+        200:
+          body:
+            application/json:
+              # type: Resource
+              type: object
+        404:
+          body:
+            application/json:
+              type: Error
